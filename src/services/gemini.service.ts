@@ -1,24 +1,25 @@
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY!,
+  apiKey: process.env.GEMINI_API_KEY!,
 });
 
 export default class GeminiService {
-    static async generate(idea: string) {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: `
+  static async generate(idea: string) {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `
 You are an expert AI prompt engineer.
 
 Create a professional Higgsfield AI video prompt.
 
-Return ONLY valid JSON.
+IMPORTANT:
+- Return ONLY valid JSON.
+- Do NOT wrap the JSON inside \`\`\`json.
+- Do NOT explain anything.
+- Do NOT add extra text.
 
-Idea:
-${idea}
-
-Format:
+Schema:
 {
   "title": "",
   "prompt": "",
@@ -31,9 +32,21 @@ Format:
   "aspectRatio": "9:16",
   "duration": "8s"
 }
-      `,
-        });
 
-        return JSON.parse(response.text!);
-    }
+Idea:
+${idea}
+`,
+    });
+
+    const text = response.text!;
+
+    console.log(text); // <-- Keep this while developing
+
+    const json = text
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    return JSON.parse(json);
+  }
 }
