@@ -1,13 +1,35 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
+import { verifyToken } from "../services/jwt.service";
+import { prisma } from "../config/db";
 
-export default function errorHandler(
-    err: any,
-    req: Request,
-    res: Response,
-    next: NextFunction
+export default async function authMiddleware(
+  req: any,
+  res: Response,
+  next: NextFunction
 ) {
-    res.status(err.statusCode || 500).json({
-        success: false,
-        message: err.message,
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized",
     });
+  }
+
+  const payload: any = verifyToken(token);
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: payload.userId,
+    },
+  });
+
+  if (!user) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
+
+  req.user = user;
+
+  next();
 }

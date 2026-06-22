@@ -1,15 +1,16 @@
 import { Router } from "express";
 import {
-    googleLogin,
-    getMe,
-    logout,
+  googleLogin,
+  getMe,
+  logout,
 } from "../controllers/auth.controller";
+import authMiddleware from "../middleware/auth.middleware";
 
 const router = Router();
 
-router.get("/google", googleLogin);
+router.post("/google", googleLogin);
 
-router.get("/me", getMe);
+router.get("/me", authMiddleware, getMe);
 
 router.post("/logout", logout);
 

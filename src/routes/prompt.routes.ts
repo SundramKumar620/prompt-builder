@@ -1,11 +1,14 @@
 import { Router } from "express";
+import authMiddleware from "../middleware/auth.middleware";
 import {
-    generatePrompt,
-    improvePrompt,
-    getPromptHistory,
+  generatePrompt,
+  getPromptHistory,
+  improvePrompt,
 } from "../controllers/prompt.controller";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.post("/generate", generatePrompt);
 

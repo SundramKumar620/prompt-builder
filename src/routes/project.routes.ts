@@ -1,13 +1,17 @@
 import { Router } from "express";
+import authMiddleware from "../middleware/auth.middleware";
+
 import {
-    createProject,
-    getProjects,
-    getProject,
-    updateProject,
-    deleteProject,
+  createProject,
+  deleteProject,
+  getProject,
+  getProjects,
+  updateProject,
 } from "../controllers/project.controller";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.post("/", createProject);
 
