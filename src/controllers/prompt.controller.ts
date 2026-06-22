@@ -21,4 +21,21 @@ export const getPromptHistory = asyncHandler(async (req: any, res: Response) => 
   );
 });
 
-export const improvePrompt = asyncHandler(async () => {});
+export const improvePrompt = asyncHandler(async (req, res) => {
+
+  const { promptId, instruction } = req.body;
+
+  const prompt = await PromptService.improve(
+    promptId,
+    instruction
+  );
+
+  res.status(201).json(
+    new ApiResponse(
+      201,
+      prompt,
+      "Prompt improved"
+    )
+  );
+
+});

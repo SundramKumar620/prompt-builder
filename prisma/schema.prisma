@@ -54,23 +54,27 @@ model Project {
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+  @@index([provider])   
 }
 
 model Prompt {
-  id              String   @id @default(cuid())
-  version         Int
+  id         String   @id @default(cuid())
 
-  idea            String   @db.Text
+  version    Int      @default(1)   // <-- add default
 
-  response        Json
+  idea       String   @db.Text
 
-  projectId       String
-  project         Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  response   Json
 
-  createdAt       DateTime @default(now())
+  projectId  String
+  project    Project @relation(fields:[projectId], references:[id], onDelete:Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@index([projectId])              // <-- add index
 }
 
-model PromptTemplate{
+model PromptTemplate {
 
   id String @id @default(cuid())
 
@@ -86,18 +90,19 @@ model PromptTemplate{
 
   favoriteTemplates FavoriteTemplate[]
 
+  @@index([category])               // <-- faster filtering
 }
 
-model FavoriteTemplate{
+model FavoriteTemplate {
 
   id String @id @default(cuid())
 
   userId String
-
   templateId String
 
-  user User @relation(fields:[userId],references:[id])
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
 
-  template PromptTemplate @relation(fields:[templateId],references:[id])
+  template PromptTemplate @relation(fields:[templateId],references:[id],onDelete:Cascade)
 
+  @@unique([userId, templateId])    // <-- prevent duplicates
 }
